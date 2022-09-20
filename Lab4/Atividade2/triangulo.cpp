@@ -1,39 +1,47 @@
 #include <iostream>
+#include <string>
 #include <vector>
 using namespace std;
 
-void tringulo(int n)
+void tringulo(int vet[], int n)
 {
+    int aux[n];
+
     if (n == 0)
     {
         return;
     }
+
     else
     {
-        return tringulo(n - 1);
+
+        int i;
+        for (i = 0; i < n; i++)
+        {
+            aux[i] = vet[i] + vet[i + 1];
+        }
+
+        tringulo(aux, n - 1);
     }
+
+    for (int j = 0; j < n; j++)
+    {
+        cout << vet[j] << ' ';
+    }
+    cout << endl;
 }
 
 int main()
 {
-    vector<int> vet;
+    int n = 0;
 
-    vet.push_back(10);
-    vet.push_back(15);
-    vet.push_back(15);
+    cin >> n;
 
-    int n = size(vet);
-    int soma1{};
-    int soma2{};
+    int vet[n];
 
     for (int i = 0; i < n; i++)
     {
-        soma1 = vet[0] + vet[1];
-        soma2 = vet[1] + vet[2];
-
-        cout << " " << vet[i];
+        cin >> vet[i];
     }
-    cout << " " << endl;
-    cout << soma1 << endl;
-    cout << soma2;
+    tringulo(vet, n);
 }
