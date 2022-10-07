@@ -1,160 +1,111 @@
 #include <iostream>
 #include <sstream>
+#include <string>
+#include <vector>
+#include "Matriz.h"
 using namespace std;
 
-// classe que implementa uma lista redimensionável
-class Vector
-{
-private:
-    int m_capacity{0}; // esse {} é o modo de inicializar default do c++ a partir do c++11
-    int m_size{0};
-    int *m_data{nullptr}; // inicializar pra não conter lixo
-
-public:
-    // construtor vazio
-    Vector()
-    {
-        // inicialize this->m_capacity com 10
-        // inicialize this->m_size com 0
-        // crie memória dinamicamente para this->m_data com tamanho m_capacity
-    }
-
-    // construtor
-    Vector(int capacity)
-    {
-        // se capacity <= 0, entao inicialize this->m_capacity com 10
-        // caso contrario, inicialize this->m_capacity com capacity.
-        // inicialize this->m_size com 0
-        // crie memória dinamicamente para this->m_data com tamanho m_capacity
-    }
-
-    // destrutor
-    ~Vector()
-    {
-        // libere this->m_data
-    }
-
-    int size()
-    {
-        // retorna size
-    }
-
-    int capacity()
-    {
-        // retorna capacity
-    }
-
-    // como seu vector tem atritutos do tipo ponteiros, você precisa criar um
-    // construtor de cópia e um operador de atribuição ou terá erros do tipo double-free
-
-    // construtor de cópia
-    // aqui você ensina seu vector a ser criado a partir de outro vector
-    // Ex:
-    // Vector v(4);
-    // Vector v2(v);
-    Vector(Vector &other)
-    {
-        // inicialize this->m_capacity com other.m_capacity
-        // inicialize this->m_size com other.m_size
-        // libere a memória em this->m_data
-        // crie memória dinamicamente para this->m_data com tamanho m_capacity
-        // copie os elementos de other.data para this->m_data
-    }
-
-    // O operador de atribuição será invocado quando você fizer um Vector receber outro
-    // Ex:
-    // Vector vec(4);
-    // vec = Vector(6);
-    // nesse ponto, os atributos de this já foram inicializados,
-    // mas você precisa alterá-los para copiar os valores de other
-    const Vector &operator=(const Vector &other)
-    {
-        if (this != &other)
-        {
-            // inicialize this->m_capacity com other.m_capacity
-            // inicialize this->m_size com other.m_size
-            // se this->m_data não for nulo, devolva a memória com delete
-            // crie nova memória para this->m_data do tamanho de other.m_capacity
-            // copie os dados de other.m_data para this->m_data
-        }
-        return *this;
-    }
-
-    // adiciona um valor ao final da lista
-    void push_back(int value)
-    {
-        // se vector estiver cheio, aumenta o tamanho para o dobro do tamanho anterior
-        // depois, adiciona value ao final do vector
-        // incrementa m_size
-    }
-
-    // remove um valor do final da lista
-    int pop_back()
-    {
-        // se a lista estiver vazia, então lance um erro do tipo std::runtime_error
-        // caso contrário:
-        // 1. remova o valor do final do vector e guarde-o em uma variavel auxiliar
-        // 2. decremente m_size
-        // 3. se m_size < m_capacity/2, diminua m_capacity para m_capacity/2
-        // 4. diminua o tamanho de m_data para m_capacity/2 e realoque os elementos
-        // 5. retorne o valor removido
-    }
-
-    // esse é o toString
-    // retorna uma string contendo a lista formatada
-    // Ex: uma lista com elementos 2,3,4,5 deve ser
-    //  retornada como a string: "[2,3,4,5]"
-    std::string toString()
-    {
-        // fazer
-    }
-};
-
-/* NAO MEXA DAQUI PRA BAIXO */
 int main()
 {
-    string line, cmd;
-    int value;
-    Vector v(0);
+    vector<Matriz *> matrizes; // Vector de ponteiros para matrizes
+
     while (true)
     {
+        string line;
+        string comando;
+
         getline(cin, line);
-        cout << "$" << line << endl;
-        stringstream ss(line);
-        ss >> cmd;
-        if (cmd == "end")
+        stringstream ss{line};
+
+        ss >> comando;
+
+        if (comando == "exit")
         {
-            break;
+            for (int i = 0; i < matrizes.size(); ++i)
+            {
+                delete matrizes[i];
+            }
+            return 0;
         }
-        else if (cmd == "init")
+        // creatematrix [l] [c]
+        else if (comando == "creatematrix")
         {
-            ss >> value;
-            v = Vector(value);
+            int l, c;
+            ss >> l;
+            ss >> c;
+            Matriz *m = new Matriz(l, c);
+            for (int i = 0; i < l; ++i)
+            {
+                for (int j = 0; j < c; ++j)
+                {
+                    int val = 0;
+                    cin >> val;
+                    cin.ignore();
+                    m->setValor(val, i, j);
+                }
+            }
+            matrizes.push_back(m);
         }
-        else if (cmd == "status")
+        // printmatrix [k]
+        else if (comando == "printmatrix")
         {
-            cout << "size:" << v.size() << " capacity:" << v.capacity() << "\n";
+            int k;
+            ss >> k;
+            matrizes[k]->print();
         }
-        else if (cmd == "push_back")
+        // nlinhas [k]
+        else if (comando == "nlinhas")
         {
-            while (ss >> value)
-                v.push_back(value);
+            int k;
+            ss >> k;
+            cout << "linhas: " << (matrizes[k])->linhas() << endl;
         }
-        else if (cmd == "pop_back")
+        // ncolunas [k]
+        else if (comando == "ncolunas")
         {
-            ss >> value;
-            cout << "popped: ";
-            for (int i = 0; i < value; ++i)
-                cout << v.pop_back() << " ";
-            cout << endl;
+            int k;
+            ss >> k;
+            cout << "colunas: " << matrizes[k]->colunas() << endl;
         }
-        else if (cmd == "show")
+        // getvalor [i] [j] [k]
+        else if (comando == "getvalor")
         {
-            cout << v.toString() << endl;
+            int i, j, k;
+            ss >> i >> j >> k;
+            cout << "valor: " << matrizes[k]->getValor(i, j) << endl;
+        }
+        // sum [p] [q]
+        else if (comando == "sum")
+        {
+            int p, q;
+            ss >> p >> q;
+            Matriz *C = matrizes[p]->soma(*(matrizes[q]));
+            if (C == nullptr)
+                cout << "nao foi possivel somar" << endl;
+            else
+            {
+                C->print();
+                delete C;
+            }
+        }
+        // multiply [p] [q]
+        else if (comando == "multiply")
+        {
+            int p, q;
+            ss >> p >> q;
+            Matriz *C = matrizes[p]->multiplica(*(matrizes[q]));
+            if (C == nullptr)
+                cout << "nao foi possivel multiplicar" << endl;
+            else
+            {
+                C->print();
+                delete C;
+            }
         }
         else
         {
-            cout << "fail: comando invalido\n";
+            cout << "comando inexistente" << endl;
         }
     }
+    return 0;
 }
