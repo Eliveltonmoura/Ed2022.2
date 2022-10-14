@@ -4,6 +4,18 @@
 #include <vector>
 #include "Matriz.h"
 using namespace std;
+void menu()
+{
+    cout << "-------------------Menu---------------------" << endl;
+    cout << "creatematrix" << endl;
+    cout << "printmatrix" << endl;
+    cout << "nlinhas" << endl;
+    cout << "ncoluna" << endl;
+    cout << "exit" << endl;
+    cout << "getvalor" << endl;
+    cout << "sum" << endl;
+    cout << "multiply" << endl;
+}
 
 int main()
 {
@@ -11,6 +23,7 @@ int main()
 
     while (true)
     {
+        menu();
         string line;
         string comando;
 
@@ -27,9 +40,11 @@ int main()
             }
             return 0;
         }
+
         // creatematrix [l] [c]
         else if (comando == "creatematrix")
         {
+
             int l, c;
             ss >> l;
             ss >> c;
@@ -39,6 +54,7 @@ int main()
                 for (int j = 0; j < c; ++j)
                 {
                     int val = 0;
+                    cout << "valor: ";
                     cin >> val;
                     cin.ignore();
                     m->setValor(val, i, j);

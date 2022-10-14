@@ -1,8 +1,8 @@
 all:Matriz.o
-	g++ Matriz.o main.cpp -o inove
+	g++ Matriz.o main.cpp -o matrizp
 main.o:Matriz.h
 	g++ -c Matriz.cpp
 c:
-	rm -rf *.o inove	
+	rm -rf *.o matrizp	
 a:
-	./inove	
+	./matrizp
