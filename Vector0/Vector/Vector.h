@@ -1,142 +1,223 @@
-#ifndef VECTOR_H
-#define VECTOR_H
 #include <iostream>
+#include <sstream>
+#include <vector>
+using namespace std;
 
+// classe que implementa uma lista redimensionável
 class Vector
 {
 private:
-    int *m_list{nullptr}; // ponteiro para a lista
-    int m_size{0};        // numero de elementos na lista
-    int m_capacity{0};    // capacidade total da lista
+    int m_capacity{0}; // esse {} é o modo de inicializar default do c++ a partir do c++11
+    int m_size{0};
+    int *m_data{nullptr}; // inicializar pra não conter lixo
 
 public:
-    // Construtor default: aloca uma lista com
-    // capacidade inicial igual a 16 e size = 0
+    // construtor vazio
     Vector()
     {
-        m_capacity = 16;
-        m_list = new int[m_capacity];
+        // inicialize this->m_capacity com 10
+        // inicialize this->m_size com 0
+        // crie memória dinamicamente para this->m_data com tamanho m_capacity
+        this->m_capacity = 10;
+        this->m_size = 0;
+        this->m_data = new int[m_capacity];
     }
 
-    // Copy constructor: cria uma nova lista com os
-    // mesmos elementos da lista passada como argumento
-    Vector(const Vector &vector) // O(n)
+    // construtor
+    Vector(int capacity)
     {
-        this->m_size = vector.m_size;
-        this->m_capacity = vector.m_capacity;
-        this->m_list = new int[this->m_capacity];
-        for (int i = 0; i < m_size; i++)
+        // se capacity <= 0, entao inicialize this->m_capacity com 10
+        // caso contrario, inicialize this->m_capacity com capacity.
+        // inicialize this->m_size com 0
+        // crie memória dinamicamente para this->m_data com tamanho m_capacity
+
+        if (capacity <= 0)
         {
-            this->m_list[i] = vector.m_list[i];
+            this->m_capacity = 10;
         }
-        std::cout << "copiar" << std::endl;
+        else
+        {
+            this->m_capacity = capacity;
+            this->m_size = 0;
+            this->m_data = new int[m_capacity];
+        }
     }
 
-    // Destrutor: libera memoria alocada
+    // destrutor
     ~Vector()
     {
-        delete[] m_list;
-        std::cout << "lista liberada" << std::endl;
+        // libere this->m_data
+        delete[] m_data;
     }
 
-    // Retorna a capacidade atual da lista
-    int capacity() const // O(1){}
+    int size()
     {
-        return m_capacity;
-    }
-
-    // Retorna o numero de elementos na lista
-    int size() const // O(1)
-    {
+        // retorna size
         return m_size;
     }
 
-    // Retorna true se e somente se a lista estiver vazia
-    bool empty() const // O(1)
+    int capacity()
     {
-        return m_size == 0;
+        // retorna capacity
+        return m_capacity;
     }
 
-    // Retorna uma referencia para o elemento na posicao k.
-    // A funcao verifica automaticamente se n esta dentro dos
-    // limites de elementos validos no vetor, lancando uma
-    // excecao 'out_of_range' se nao estiver.
-    int &at(int k) // O(1)
+    // como seu vector tem atributos do tipo ponteiros, você precisa criar um
+    // construtor de cópia e um operador de atribuição ou terá erros do tipo double-free
+
+    // construtor de cópia
+    // aqui você ensina seu vector a ser criado a partir de outro vector
+    // Ex:
+    // Vector v(4);
+    // Vector v2(v);
+    Vector(Vector &other)
     {
-        if (k < 0 || k >= m_size)
+        // inicialize this->m_capacity com other.m_capacity
+        // inicialize this->m_size com other.m_size
+        // libere a memória em this->m_data
+        // crie memória dinamicamente para this->m_data com tamanho m_capacity
+        // copie os elementos de other.data para this->m_data
+        this->m_capacity = other.m_capacity;
+        this->m_size = other.m_size;
+        this->m_data = new int[this->m_capacity];
+        for (int i = 0; i < m_size; i++)
         {
-            /// lança erro
-            throw std::runtime_error("fail: indice invalido");
+            this->m_data[i] = other.m_data[i];
         }
-        return m_list[k]
+        cout << "lista criada" << endl;
     }
-    const int &at(int k) const // O(1)
+
+    // O operador de atribuição será invocado quando você fizer um Vector receber outro
+    // Ex:
+    // Vector vec(4);
+    // vec = Vector(6);
+    // nesse ponto, os atributos de this já foram inicializados,
+    // mas você precisa alterá-los para copiar os valores de other
+    const Vector &operator=(const Vector &other)
     {
-        if (k < 0 || k >= m_size)
+        if (this != &other)
         {
-            /// lança erro
-            throw std::runtime_error("fail: indice invalido");
+            // inicialize this->m_capacity com other.m_capacity
+            // inicialize this->m_size com other.m_size
+            // se this->m_data não for nulo, devolva a memória com delete
+            // crie nova memória para this->m_data do tamanho de other.m_capacity
+            // copie os dados de other.m_data para this->m_data
+            this->m_capacity = other.m_capacity;
+            this->m_size = other.m_size;
+            if (this->m_data != nullptr)
+            {
+                delete m_data;
+            }
+            else
+            {
+                m_data = new int[m_capacity];
+                this->m_data = other.m_data;
+            }
         }
-        return m_list[k]
+        return *this;
     }
 
-    // Retorna uma referencia para o elemento na posicao k.
-    // Essas funcoes nao verificam se o indice eh valido.
-    int &operator[](int index) // O(1)
+    // adiciona um valor ao final da lista
+    void push_back(int value)
     {
-        return m_list[index];
-    }
-    const int &operator[](int index) const // O(1)
-    {
-        return m_list[index];
-    }
-
-    // Solicita que a capacidade do vetor seja >= n.
-    // Se n for maior que a capacidade atual do vetor, a
-    // funcao faz com que a lista aumente sua capacidade
-    // realocando os elementos para o novo vetor. Em todos
-    // os outros casos, a chamada da funcao nao causa uma
-    // realocacao e a capacidade do vetor nao eh afetada.
-    void reserve(int n) // O(n)
-    {
-        if (n > m_capacity)
+        // se vector estiver cheio, aumenta o tamanho para o dobro do tamanho anterior
+        // depois, adiciona value ao final do vector
+        // incrementa m_size
+        if (value > m_capacity)
         {
-            m_capacity = n;
+            m_capacity = value;
             int *aux = new int[m_capacity];
         }
         for (int i = 0; i < m_size; i++)
         {
-            aux[i] = m_list[i];
+            *aux[i] = m_data[i];
         }
-        delete[] m_list;
-        m_list = aux;
+        delete[] m_data;
+        m_data = aux;
     }
+    m_size++;
 
-    // Recebe um inteiro como argumento e o adiciona
-    // logo apos o ultimo elemento da lista.
-    void push_back(const int &value) // tempo medio O(1)
+}
+
+// remove um valor do final da lista
+int
+pop_back()
+{
+    // se a lista estiver vazia, então lance um erro do tipo std::runtime_error
+    // caso contrário:
+    // 1. remova o valor do final do vector e guarde-o em uma variavel auxiliar
+    // 2. decremente m_size
+    // 3. se m_size < m_capacity/2, diminua m_capacity para m_capacity/2
+    // 4. diminua o tamanho de m_data para m_capacity/2 e realoque os elementos
+    // 5. retorne o valor removido
+    if (m_data == nullptr)
     {
-        if (m_size == m_capacity)
-        {
-            reserve(1.5 * m_capacity);
-        }
-        m_list[m_size] = value;
-        m_size++;
+        throw std::runtime_error("fail: indice invalido");
     }
-
-    // Remove o ultimo elemento da lista se a lista nao
-    // estiver vazia. Caso contrario, faz nada
-    void pop_back() // O(1)
+    else
     {
-        if (!empty())
+        for (int i = 0; i < m_size; i++)
         {
-            m_size--;
+            m_data[i];
         }
     }
+}
 
-    // void insert(int index, int v) // insersão de memoria
-    // {
-    // }
-};
+// esse é o toString
+// retorna uma string contendo a lista formatada
+// Ex: uma lista com elementos 2,3,4,5 deve ser
+//  retornada como a string: "[2,3,4,5]"
+std::string toString()
+{
+}
+}
+;
 
-#endif
+/* NAO MEXA DAQUI PRA BAIXO */
+int main()
+{
+    string line, cmd;
+    int value;
+    Vector v(0);
+    while (true)
+    {
+        getline(cin, line);
+        cout << "$" << line << endl;
+        stringstream ss(line);
+        ss >> cmd;
+        if (cmd == "end")
+        {
+            break;
+        }
+        else if (cmd == "init")
+        {
+            ss >> value;
+            v = Vector(value);
+        }
+        else if (cmd == "status")
+        {
+            cout << "size:" << v.size() << " capacity:" << v.capacity() << "\n";
+        }
+        else if (cmd == "push_back")
+        {
+            while (ss >> value)
+                v.push_back(value);
+        }
+        else if (cmd == "pop_back")
+        {
+            ss >> value;
+            cout << "popped: ";
+            for (int i = 0; i < value; ++i)
+                cout << v.pop_back() << " ";
+            cout << endl;
+        }
+        else if (cmd == "show")
+        {
+            cout << v.toString() << endl;
+        }
+        else
+        {
+            cout << "fail: comando invalido\n";
+        }
+    }
+}

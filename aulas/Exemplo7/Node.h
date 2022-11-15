@@ -18,7 +18,7 @@ struct Node
     }
     ~Node()
     {
-        std::cout << "Node" << value << "liberada" << endl;
+        std::cout << "Node " << value << " liberada" << endl;
     }
 };
 
