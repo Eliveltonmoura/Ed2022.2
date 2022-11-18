@@ -111,8 +111,10 @@ Node *clear_recursivo(Node, *node)
  */
 void BinaryTree::clear()
 {
+    root = clear_recursivo();
 }
 
 BinaryTree::~BinaryTree()
 {
+    clear();
 }
