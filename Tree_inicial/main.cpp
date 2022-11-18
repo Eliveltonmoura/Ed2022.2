@@ -2,7 +2,8 @@
 #include "BinaryTree.h"
 using namespace std;
 
-int main() {
+int main()
+{
     BinaryTree tnull;
     BinaryTree t34(34, tnull, tnull);
     BinaryTree t21(21, tnull, tnull);
@@ -11,4 +12,7 @@ int main() {
     BinaryTree t1(1, t76, t55);
 
     t1.print_keys();
+
+    cout << t1.contains(100) << endl;
+    cout << t1.contains(34) << endl;
 }
